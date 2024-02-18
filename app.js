@@ -19,6 +19,7 @@ let leftPaddleTop = 10;
 let rightPaddleTop = 30;
 let leftScore = 0;
 let rightScore = 0;
+let gameOver = false;
 
 document.addEventListener('mousemove', e => {
     rightPaddleTop = e.y > height - PADDLE_HEIGHT
@@ -48,6 +49,12 @@ function followBall() {
     }
 }
 
+function drawGameOver() {
+    ctx.fillStyle = 'white';
+    ctx.font = '30px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', width / 2, height / 2);
+}
 
 function draw() {
     //Заливаем холст черным
@@ -96,11 +103,7 @@ function checkPaddleCollision(ball, paddle) {
 }
 
 function adjustAngle(distanceFromTop, distanceFromBottom) {
-    if(distanceFromTop < 0) {
-        // If ball hit near top of paddle, reduce ySpeed
-        ySpeed -= 0.5;
-    } else if (distanceFromBottom < 0) {
-        // If ball hit near bottom of paddle, increase ySpeed
+    if(distanceFromTop < 0 || distanceFromBottom < 0) {
         ySpeed += 0.5;
     }
 }
@@ -151,6 +154,10 @@ function checkCollision() {
         initBall();
     }
 
+    if(leftScore > 9 || rightScore > 9) {
+        gameOver = true;
+    }
+
     if(ball.top < 0 || ball.bottom > height) {
         ySpeed = - ySpeed;
     }
@@ -160,8 +167,14 @@ function gameLoop() {
     draw();
     update();
     checkCollision();
+    if(gameOver) {
+        draw();
+        drawGameOver();
+    } else {
+        //// Call this function again after a timeout
+        setTimeout(gameLoop, 30);
+    }
 
-    setTimeout(gameLoop, 30);
 }
 
 initBall();
